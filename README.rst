@@ -2,7 +2,7 @@
 Object Storage (OpenStack Swift)
 ================================
 
-Genral information about Openstack Swift can be found at:
+General information about Openstack Swift can be found at:
 
     - https://wiki.openstack.org/wiki/Swift
 
@@ -80,7 +80,7 @@ to the internet and management switch in the cluster to be configured.
 
 #. Read `swift.pdf <https://github.com/open-power-ref-design/standalone-swift/blob/master/swift.pdf>`_
 
-#. Choose a small, medium, or large cluster configuration template
+#. Choose a small, medium, or large deployment configuration file
 
 #. Rack and cable hardware as indicated
 
@@ -131,7 +131,7 @@ to the internet and management switch in the cluster to be configured.
 
    $ ./scripts/create-cluster
 
-   Note this command is invoked on the first controller node.  The commands
+   Note this command is invoked on the first OpenStack controller node.  The commands
    listed above are invoked on the deployer node.  When cluster-genesis completes,
    it displays on the screen instructions for invoking the command above.
 
@@ -377,7 +377,8 @@ Administration for OpenStack Swift
 ----------------------------------
 
 The OpenStack Ansible playbooks can be used to perform administrative
-tasks in the cluster.  The playbooks are found on the deployer node in::
+tasks in the cluster.  The playbooks are found on the first OpenStack
+controller node in::
 
   /opt/openstack-ansible/playbooks
 
