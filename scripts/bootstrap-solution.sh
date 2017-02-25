@@ -6,8 +6,8 @@
 # Example:
 #   GIT_BRANCH=master
 #   SOLUTION_BRANCH=master
-#   URL="https://raw.githubusercontent.com/open-power-ref-design-toolkit/"\
-#   "dbaas/${SOLUTION_BRANCH}/scripts/bootstrap-solution.sh"
+#   URL="https://raw.githubusercontent.com/open-power-ref-design/"\
+#   "standalone-swift/${SOLUTION_BRANCH}/scripts/bootstrap-solution.sh"
 #   wget $URL
 #   chmod +x bootstrap-solution.sh
 #   ./bootstrap-solution.sh
