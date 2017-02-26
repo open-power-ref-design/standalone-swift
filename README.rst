@@ -51,8 +51,8 @@ More properly, in the bare metal installation step, only the installation tools
 for OpenStack and Swift were installed, not the actual services.  The next step
 is to configure these tools, so that they install the actual services in a
 prescribed manner so that they fit properly in the data center.  The two
-projects are os-services and ceph-services.  See the README files of each project
-to determine what is required here.
+projects that are involved are os-services and opsmgr.  See the README files
+of each project to determine what may be configured.
 
 The final step is to invoke cluster-create.sh in the os-services
 repository to install and configure the cluster.  os-services orchestrates
@@ -108,7 +108,7 @@ to the internet and management switch in the cluster to be configured.
 
 #. Validate the configuration file::
 
-   $ git clone git://github.com/open-power-ref-design/os-services
+   $ git clone git://github.com/open-power-ref-design-toolkit/os-services
    $ cd os-services
    $ git checkout $TAG
    $ ./scripts/validate_config.py --file $CFG
