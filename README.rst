@@ -22,8 +22,8 @@ servers, switches, and cables.
 
 The Deployment configuration file provides a mapping of servers and switches
 to software for the purposes of deployment.  Each server is mapped to a set
-of OpenStack based software roles constituting the control plane, compute
-plane, and storage plane.  Each role is defined in terms of a Linux
+of OpenStack based software roles constituting the control plane, Swift proxy
+plane, and Swift object plane.  Each role is defined in terms of a Linux
 distribution (Ubuntu) to be loaded and a set of operating system based
 resources such as users and networks that need to be configured
 to satisfy that role.
@@ -38,7 +38,7 @@ installation is properly integrated into the data center.
 The installation process is split into two parts::
 
     > Bare metal installation of Linux
-    > Installation of OpenStack, Swift, and Operational Management
+    > Installation of OpenStack Swift, and Operational Management
 
 The Deployment configuration file is fed into the bare metal installation
 process which is performed by cluster-genesis.  The operating system is loaded
@@ -55,18 +55,19 @@ of each project to determine what may be configured.
 
 The final step is to invoke cluster-create.sh in the os-services
 repository to install and configure the cluster.  os-services orchestrates
-the installation process of OpenStack, Swift, and Operational Management
+the installation process of OpenStack Swift, and Operational Management
 which are loaded into the first controller that is setup by cluster-genesis.
 
 The OpenStack dashboard may be reached through your browser:
 
-https://<ipaddr or hostname of an OpenStack control node>
+https://<ipaddr from external-floating-ipaddr in the config.yaml>
 
 This recipe also includes an operational management console which is
 integrated into the OpenStack dashboard.  It monitors the cloud infrastructure
 and shows metrics relates to the capacity, utilization, and health of the
 cloud infrastructure.  It may also be configured to generate alerts when
 components fail.  It is provided through the opsmgr repository.
+
 
 .. Hint::
    Only os-services must be configured before invoking create-cluster.  For
@@ -107,6 +108,8 @@ to the internet and management switch in the cluster to be configured.
 
 #. Validate the configuration file::
 
+   $ apt-get install python-pip
+   $ pip install pyyaml
    $ git clone git://github.com/open-power-ref-design-toolkit/os-services
    $ cd os-services
    $ git checkout $TAG
