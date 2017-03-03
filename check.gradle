@@ -1,10 +1,9 @@
 task check (type : Exec) {
-     print 'Building standalone-swift'
-     executable = "ls";
-    standardOutput = new ByteArrayOutputStream()
-    ext.output = {
-       return standardOutput.toString()
-    }
+    print 'Check task on standalone-swift:'
+    workingDir '.'
+    // Run the default tox environment.
+    executable = "tox"
+    args "-r"
 }
 task do_all{
   check.execute();
