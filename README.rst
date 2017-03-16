@@ -9,9 +9,9 @@ General information about Openstack Swift can be found at:
 This repository provides the following:
 
     - `Bill of Materials <https://github.com/open-power-ref-design/standalone-swift/blob/master/swift.pdf>`_
-    - `Deployment configuration file for a small size cluster <https://github.com/open-power-ref-design/standalone-swift/blob/master/small-config.yml>`_
-    - `Deployment configuration file for a medium size cluster <https://github.com/open-power-ref-design/standalone-swift/blob/master/medium-config.yml>`_
-    - `Deployment configuration file for a large size cluster <https://github.com/open-power-ref-design/standalone-swift/blob/master/large-config.yml>`_
+    - `Deployment configuration file for a small size cluster <https://github.com/open-power-ref-design/standalone-swift/blob/master/config-small.yml>`_
+    - `Deployment configuration file for a medium size cluster <https://github.com/open-power-ref-design/standalone-swift/blob/master/config-medium.yml>`_
+    - `Deployment configuration file for a large size cluster <https://github.com/open-power-ref-design/standalone-swift/blob/master/config-large.yml>`_
 
 The Bill of Materials document provides a description and representation of
 a Standalone Swift Cluster
@@ -60,7 +60,7 @@ which are loaded into the first controller that is setup by cluster-genesis.
 
 The OpenStack dashboard may be reached through your browser:
 
-https://<ipaddr from external-floating-ipaddr in the config.yaml>
+https://<ipaddr from external-floating-ipaddr in the config-name.yml>
 
 This recipe also includes an operational management console which is
 integrated into the OpenStack dashboard.  It monitors the cloud infrastructure

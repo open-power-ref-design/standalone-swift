@@ -1,5 +1,5 @@
 ---
-# Copyright 2016 IBM Corp.
+# Copyright 2016, 2017 IBM Corp.
 #
 # All Rights Reserved.
 #
@@ -33,44 +33,79 @@ vlan-mgmt-network: 16
 vlan-mgmt-client-network: 20
 port-mgmt-network: 46
 port-mgmt-data-network:
-    rack1: 47
+    rack1:
+        - 45
+        - 47
 ipaddr-mgmt-switch:
     rack1: 192.168.16.20
 ipaddr-data-switch:
-    rack1: 192.168.16.25
-redundant-network: false
+    rack1:
+        - 192.168.16.25
+        - 192.168.16.30
+ipaddr-mlag-vip:
+    _rack1: 192.168.16.254
+cidr-mlag-ipl:
+    _rack1:
+        - 10.0.0.1/24
+        - 10.0.0.2/24
+mlag-vlan:
+    _rack1: 4000
+mlag-port-channel:
+    _rack1: 35
+mlag-ipl-ports:
+    _rack1:
+        -
+            - 37
+            - 38
+        -
+            - 37
+            - 38
+redundant-network: true
 userid-default: ubuntu
 password-default: passw0rd
-userid-mgmt-switch: admin    # applied to all mgmt switches
-password-mgmt-switch: admin  # applied to all mgmt switches
+userid-mgmt-switch: admin    # applies to all mgmt switches
+password-mgmt-switch: admin  # applies to all mgmt switches
 userid-data-switch: admin
 password-data-switch: admin
 internal-floating-ipaddr: 172.29.236.50
 external-floating-ipaddr: 10.0.16.50
 networks:
-    external1:
-        description: Organization site or external network
-        addr: 10.0.16.0/22
-        # Note you can uncomment the following section to provide a set of IPs
-        # on this network that will be allocated to the hosts.  The default
-        # behavior is to allocate from the full subnet.
-        # available-ips:
-            # - 10.0.16.20
-            # - 10.0.16.35
-            # - 10.0.16.106 10.0.16.110  # this is an IP range
-            # - 10.0.16.115
-        broadcast: 10.0.19.255
-        gateway: 10.0.16.1
-#        dns-nameservers: 10.0.16.200
-#        dns-search: mycompany.domain.com
-        method: static
+    ext1:
+        description: Interface for eth10
+        method: manual
         eth-port: eth10
         mtu: 9000
-    external2:
+    ext2:
         description: Interface for eth11
         method: manual
         eth-port: eth11
         mtu: 9000
+    external1:
+        description: bonded public interface
+        bond: osbond0
+        addr: 10.0.16.0/22
+        # Note you can uncomment the following section to provide a set of IPs
+        # on this network that will be allocated to the hosts.  The default
+        # behavior is to allocate from the full subnet.
+        #available-ips:
+        #    - 10.0.16.20
+        #    - 10.0.16.35
+        #    - 10.0.16.106 10.0.16.110  # this is an IP range
+        #    - 10.0.16.115
+        broadcast: 10.0.19.255
+        gateway: 10.0.16.1
+        #dns-nameservers: 10.0.16.200
+        #dns-search: mycompany.domain.com
+        method: static
+        bond-interfaces:
+            - eth10
+            - eth11
+        mtu: 9000
+        bond-primary: eth10
+        bond-mode: 4
+        optional-bond-arguments:
+            bond-miimon: 100
+            bond-lacp-rate: 1
     pxe-dhcp:
         description: Change pxe port(eth15) to dhcp
         method: dhcp
@@ -82,7 +117,7 @@ networks:
         tcp_segmentation_offload: 'off'
         addr: 172.29.236.0/22
         vlan: 10
-        eth-port: eth10
+        eth-port: osbond0
         mtu: 9000
     openstack-stg:
         description: OpenStack Storage Network
@@ -91,7 +126,7 @@ networks:
         tcp_segmentation_offload: 'off'
         addr: 172.29.244.0/22
         vlan: 20
-        eth-port: eth10
+        eth-port: osbond0
         mtu: 9000
     swift-replication:
         description: Swift Replication Network
@@ -99,7 +134,7 @@ networks:
         bridge: br-swift-repl
         method: static
         vlan: 30
-        eth-port: eth11
+        eth-port: osbond0
         mtu: 9000
 racks:
     - rack-id: rack1
@@ -140,14 +175,16 @@ node-templates:
                     - 3
             eth11:
                 rack1:
-                    - 4
-                    - 5
-                    - 6
+                    - 1
+                    - 2
+                    - 3
         networks:
+            - ext1
+            - ext2
+            - external1
             - openstack-mgmt
             - openstack-stg
-            - external1
-            - external2
+
             - pxe-dhcp
     swift-proxy:
         hostname: swiftproxy
@@ -182,13 +219,14 @@ node-templates:
                     - 21
             eth11:
                 rack1:
-                    - 22
-                    - 23
-                    - 24
+                    - 19
+                    - 20
+                    - 21
         networks:
-            - pxe-dhcp
+            - ext1
+            - ext2
             - external1
-            - external2
+            - pxe-dhcp
             - openstack-mgmt
             - openstack-stg
     swift-metadata:
@@ -219,14 +257,14 @@ node-templates:
                     - 30
             eth10:
                 rack1:
-                    - 25
-                    - 26
-                    - 27
+                    - 22
+                    - 23
+                    - 24
             eth11:
                 rack1:
-                    - 28
-                    - 29
-                    - 30
+                    - 22
+                    - 23
+                    - 24
         domain-settings:
             # These settings specify the list of devices that will be used
             # for the rings.  The values can be disk device by path, in which
@@ -237,9 +275,10 @@ node-templates:
             container-ring-devices:
                 - /dev/disk/by-path/pci-0000:01
         networks:
-            - pxe-dhcp
+            - ext1
+            - ext2
             - external1
-            - external2
+            - pxe-dhcp
             - openstack-mgmt
             - openstack-stg
             - swift-replication
@@ -271,14 +310,14 @@ node-templates:
                     - 36
             eth10:
                 rack1:
-                    - 31
-                    - 32
-                    - 33
+                    - 25
+                    - 26
+                    - 27
             eth11:
                 rack1:
-                    - 34
-                    - 35
-                    - 36
+                    - 25
+                    - 26
+                    - 27
         domain-settings:
             # These settings specify the list of devices that will be used
             # for the rings.  The values can be disk device by path, in which
@@ -289,8 +328,9 @@ node-templates:
 
         networks:
             - pxe-dhcp
+            - ext1
+            - ext2
             - external1
-            - external2
             - openstack-mgmt
             - openstack-stg
             - swift-replication
@@ -305,4 +345,3 @@ software-bootstrap:
         wget ${URL}
         chmod +x bootstrap-solution.sh
         ./bootstrap-solution.sh
-
