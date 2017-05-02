@@ -81,6 +81,20 @@ networks:
         method: manual
         eth-port: eth11
         mtu: 9000
+    ext3:
+        description: Interface for eth12
+        method: manual
+        eth-port: eth12
+        mtu: 9000
+    ext4:
+        description: Interface for eth13
+        method: manual
+        eth-port: eth13
+        mtu: 9000
+    pxe-dhcp:
+        description: Change pxe port(eth15) to dhcp
+        method: dhcp
+        eth-port: eth15
     external1:
         description: bonded public interface
         bond: osbond0
@@ -107,10 +121,20 @@ networks:
         optional-bond-arguments:
             bond-miimon: 100
             bond-lacp-rate: 1
-    pxe-dhcp:
-        description: Change pxe port(eth15) to dhcp
-        method: dhcp
-        eth-port: eth15
+    external2:
+        description: bonded interface
+        bond: osbond1
+        method: manual
+        bond-interfaces:
+        # for full protection against failure, eth12 and eth13 should come from different NICs
+            - eth12
+            - eth13
+        mtu: 9000
+        bond-primary: eth12
+        bond-mode: 4
+        optional-bond-arguments:
+            bond-miimon: 100
+            bond-lacp-rate: 1
     openstack-mgmt:
         description: OpenStack Management Network
         bridge: br-mgmt
@@ -135,7 +159,7 @@ networks:
         bridge: br-swift-repl
         method: static
         vlan: 30
-        eth-port: osbond0
+        eth-port: osbond1
         mtu: 9000
 racks:
     - rack-id: rack1
@@ -155,6 +179,8 @@ node-templates:
             mac-pxe: eth15
             mac-eth10: eth10
             mac-eth11: eth11
+            mac-eth12: eth12
+            mac-eth13: eth13
         # Each host has one network interface for each of these ports and
         # these port numbers represent the switch port number to which the host
         # interface is cabled.  If a port can be broken out using breakout
@@ -172,67 +198,36 @@ node-templates:
                     - 4
                     - 5
                     - 6
-            eth10:
+            eth10:       # for MLAG setup, these connect to 1st data switch
                 rack1:
                     - 1
                     - 2
                     - 3
-            eth11:
+            eth11:       # for MLAG setup, these connect to 2nd data switch
                 rack1:
                     - 1
                     - 2
                     - 3
+            eth12:       # for MLAG setup, these connect to 1st data switch
+                rack1:
+                    - 4
+                    - 5
+                    - 6
+            eth13:       # for MLAG setup, these connect to 2nd data switch
+                rack1:
+                    - 4
+                    - 5
+                    - 6
         networks:
             - ext1
             - ext2
+            - ext3
+            - ext4
             - external1
+            - external2
             - openstack-mgmt
             - openstack-stg
-
             - pxe-dhcp
-    swift-proxy:
-        hostname: swiftproxy
-        userid-ipmi: admin
-        password-ipmi: admin
-        cobbler-profile: ubuntu-16.04.1-server-ppc64el
-        name-interfaces:
-            mac-pxe: eth15
-            mac-eth10: eth10
-            mac-eth11: eth11
-        # Each host has one network interface for each of these ports and
-        # these port numbers represent the switch port number to which the host
-        # interface is cabled.  If a port can be broken out using breakout
-        # cables, then this would be specified as '- <port>/<sub-port>'.
-        # To add or remove hosts for this node-template you add or remove
-        # switch port numbers to these ports.
-        ports:
-            pxe:
-                rack1:
-                    - 19
-                    - 20
-                    - 21
-            ipmi:
-                rack1:
-                    - 22
-                    - 23
-                    - 24
-            eth10:
-                rack1:
-                    - 19
-                    - 20
-                    - 21
-            eth11:
-                rack1:
-                    - 19
-                    - 20
-                    - 21
-        networks:
-            - ext1
-            - ext2
-            - external1
-            - pxe-dhcp
-            - openstack-mgmt
-            - openstack-stg
     swift-object:
         hostname: swiftobject
         userid-ipmi: admin
@@ -242,6 +237,8 @@ node-templates:
             mac-pxe: eth15
             mac-eth10: eth10
             mac-eth11: eth11
+            mac-eth12: eth12
+            mac-eth13: eth13
         # Each host has one network interface for each of these ports and
         # these port numbers represent the switch port number to which the host
         # interface is cabled.  If a port can be broken out using breakout
@@ -251,24 +248,45 @@ node-templates:
         ports:
             pxe:
                 rack1:
-                    - 31
-                    - 32
-                    - 33
+                    - 7
+                    - 8
+                    - 9
             ipmi:
                 rack1:
-                    - 34
-                    - 35
-                    - 36
+                    - 10
+                    - 11
+                    - 12
             eth10:
                 rack1:
-                    - 25
-                    - 26
-                    - 27
+                    - 7
+                    - 8
+                    - 9
             eth11:
                 rack1:
-                    - 25
-                    - 26
-                    - 27
+                    - 7
+                    - 8
+                    - 9
+            eth12:
+                rack1:
+                    - 10
+                    - 11
+                    - 12
+            eth13:
+                rack1:
+                    - 10
+                    - 11
+                    - 12
+        networks:
+            - ext1
+            - ext2
+            - ext3
+            - ext4
+            - external1
+            - external2
+            - openstack-mgmt
+            - openstack-stg
+            - swift-replication
+            - pxe-dhcp
         domain-settings:
             # These settings specify the list of devices that will be used
             # for the rings.  The values can be disk device by path, in which
@@ -280,15 +298,64 @@ node-templates:
                 - /dev/disk/by-path/pci-0000:01
             object-ring-devices:
                 - /dev/disk/by-path/pci-0004:01
-
+    swift-proxy:
+        hostname: swiftproxy
+        userid-ipmi: admin
+        password-ipmi: admin
+        cobbler-profile: ubuntu-16.04.1-server-ppc64el
+        name-interfaces:
+            mac-pxe: eth15
+            mac-eth10: eth10
+            mac-eth11: eth11
+            mac-eth12: eth12
+            mac-eth13: eth13
+        # Each host has one network interface for each of these ports and
+        # these port numbers represent the switch port number to which the host
+        # interface is cabled.  If a port can be broken out using breakout
+        # cables, then this would be specified as '- <port>/<sub-port>'.
+        # To add or remove hosts for this node-template you add or remove
+        # switch port numbers to these ports.
+        ports:
+            pxe:
+                rack1:
+                    - 13
+                    - 14
+                    - 15
+            ipmi:
+                rack1:
+                    - 16
+                    - 17
+                    - 18
+            eth10:
+                rack1:
+                    - 13
+                    - 14
+                    - 15
+            eth11:
+                rack1:
+                    - 13
+                    - 14
+                    - 15
+            eth12:
+                rack1:
+                    - 16
+                    - 17
+                    - 18
+            eth13:
+                rack1:
+                    - 16
+                    - 17
+                    - 18
         networks:
-            - pxe-dhcp
             - ext1
             - ext2
+            - ext3
+            - ext4
             - external1
+            - external2
             - openstack-mgmt
             - openstack-stg
-            - swift-replication
+            - pxe-dhcp
 
 software-bootstrap:
     controllers[0]: |
@@ -300,3 +367,4 @@ software-bootstrap:
         wget ${URL}
         chmod +x bootstrap-solution.sh
         ./bootstrap-solution.sh
+
