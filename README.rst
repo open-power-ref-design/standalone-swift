@@ -8,7 +8,7 @@ General information about Openstack Swift can be found at:
 
 This repository provides the following:
 
-    - `Bill of Materials <https://github.com/open-power-ref-design/standalone-swift/blob/master/swift.pdf>`_
+    - `Bill of Materials <https://github.com/open-power-ref-design/standalone-swift/blob/master/docs/bom.pdf>`_
     - `Deployment configuration file for a small size cluster <https://github.com/open-power-ref-design/standalone-swift/blob/master/config-small.yml>`_
     - `Deployment configuration file for a medium size cluster <https://github.com/open-power-ref-design/standalone-swift/blob/master/config-medium.yml>`_
     - `Deployment configuration file for a large size cluster <https://github.com/open-power-ref-design/standalone-swift/blob/master/config-large.yml>`_
@@ -82,7 +82,7 @@ Getting Started
 The toolkit runs on an Ubuntu 16.04 OpenPOWER server or VM that is connected
 to the internet and management switch in the cluster to be configured.
 
-#. Read `swift.pdf <https://github.com/open-power-ref-design/standalone-swift/blob/master/swift.pdf>`_
+#. Read the `Bill Of Materials <https://github.com/open-power-ref-design/standalone-swift/blob/master/docs/bom.pdf>`_
 
 #. Choose a small, medium, or large deployment configuration file
 
