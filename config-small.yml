@@ -300,7 +300,7 @@ node-templates:
 
 software-bootstrap:
     controllers[0]: |
-        export GIT_BRANCH=newton
+        export GIT_BRANCH=v1.6.0
         export DEPLOY_CEPH=no
         export DEPLOY_OPSMGR=yes
         # export ANSIBLE_HOST_KEY_CHECKING=False
